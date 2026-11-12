@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>PolestarApp</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Biblioteca para reproducir GIF animados en WPF (licencia Apache 2.0) -->
+    <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\**\*.png;Assets\**\*.jpg;Assets\**\*.svg" />
+    <Resource Include="Images\**\*.gif" />
+    <!-- Fotos de los modelos (Wikimedia Commons; autores y licencias en Docs/documentacion-tecnica.md) -->
+    <Resource Include="Images\**\*.jpg" />
+  </ItemGroup>
+
+</Project>

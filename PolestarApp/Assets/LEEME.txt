@@ -1,0 +1,2 @@
+Coloca aquí imágenes, logotipo y otros recursos gráficos.
+Anota el origen y la licencia de cada uno en la documentación (requisito del apartado 3).

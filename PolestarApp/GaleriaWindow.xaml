@@ -1,0 +1,213 @@
+<Window x:Class="PolestarApp.GaleriaWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="clr-namespace:PolestarApp.Controls"
+        FontFamily="Segoe UI" Foreground="{StaticResource BrTexto}"
+        Title="Polestar · Galería" Height="780" Width="1280" MinHeight="740" MinWidth="1200"
+        WindowStartupLocation="CenterScreen" Background="{StaticResource BrFondo}" KeyDown="Window_KeyDown">
+
+    <Window.Resources>
+        <!-- Apertura del panel de detalle: entra desde la derecha con fundido (200 ms). Editable en Blend. -->
+        <Storyboard x:Key="SbAbrirDetalle">
+            <DoubleAnimation Storyboard.TargetName="PanelDetalle" Storyboard.TargetProperty="Opacity"
+                             From="0" To="1" Duration="0:0:0.2"/>
+            <DoubleAnimation Storyboard.TargetName="PanelDetalle"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                             From="24" To="0" Duration="0:0:0.2">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+
+        <Style x:Key="ComboFiltro" TargetType="ComboBox">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>   <!-- Cabecera común: logotipo + menú + sesión -->
+            <RowDefinition Height="*"/>      <!-- Contenido de la sección -->
+            <RowDefinition Height="Auto"/>   <!-- Pie común -->
+        </Grid.RowDefinitions>
+
+        <c:Cabecera Grid.Row="0" Seccion="Galeria"/>
+
+        <!-- ================= CONTENIDO (sin barra de desplazamiento) ================= -->
+        <Grid x:Name="Contenido" Grid.Row="1">
+            <Grid Margin="32,20,32,24">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>   <!-- Título -->
+                    <RowDefinition Height="Auto"/>   <!-- Filtros -->
+                    <RowDefinition Height="Auto"/>   <!-- Contador -->
+                    <RowDefinition Height="*"/>      <!-- Cuadrícula de 4 x 2 tarjetas -->
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- ============ TÍTULO ============ -->
+                <!-- Título y contador en la misma línea: deja más alto a las fotos de las tarjetas -->
+                <DockPanel Grid.Row="0" LastChildFill="False">
+                    <TextBlock Text="Galería de modelos" Style="{StaticResource TxtH1}" DockPanel.Dock="Left"/>
+                    <TextBlock x:Name="TxtResultados" DockPanel.Dock="Right" Style="{StaticResource TxtSecundario}"
+                               FontSize="14" VerticalAlignment="Bottom" Margin="0,0,0,4"/>
+                </DockPanel>
+
+                <!-- ============ FILTROS (una sola fila, alturas iguales) ============ -->
+                <Grid Grid.Row="1" Margin="0,12,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" MinWidth="140" MaxWidth="260"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="190"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <Label Content="_Buscar" Target="{Binding ElementName=TxtBuscar}"/>
+                        <TextBox x:Name="TxtBuscar" Style="{StaticResource CampoTexto}" Height="36" Padding="10,0"
+                                 VerticalContentAlignment="Center"
+                                 TextChanged="Filtros_Cambiados" ToolTip="Escribe un modelo, versión o tipo (p. ej. «SUV»)"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <Label Content="_Tipo" Target="{Binding ElementName=CmbTipo}"/>
+                        <ComboBox x:Name="CmbTipo" Style="{StaticResource ComboFiltro}" SelectionChanged="Filtros_Cambiados"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="4">
+                        <Label Content="_Ordenar por" Target="{Binding ElementName=CmbOrden}"/>
+                        <ComboBox x:Name="CmbOrden" Style="{StaticResource ComboFiltro}" SelectionChanged="Filtros_Cambiados"/>
+                    </StackPanel>
+                    <CheckBox x:Name="ChkSoloOfertas" Grid.Column="6" Content="Solo o_fertas" FontSize="14"
+                              VerticalAlignment="Bottom" Margin="0,0,0,9"
+                              Checked="Filtros_Cambiados" Unchecked="Filtros_Cambiados"/>
+                    <Button x:Name="BtnLimpiar" Grid.Column="8" Content="_Limpiar filtros" Style="{StaticResource BtnEnlace}"
+                            VerticalAlignment="Bottom" Margin="0,0,0,7" Click="BtnLimpiar_Click"/>
+                </Grid>
+
+
+                <!-- ============ RESULTADOS: cuadrícula fija de 4 columnas x 2 filas ============
+                     Las 8 versiones del catálogo caben siempre; al filtrar, las tarjetas mantienen su tamaño. -->
+                <Grid Grid.Row="3">
+                    <ItemsControl x:Name="ListaCoches" Margin="-6" Focusable="False"
+                                  ItemTemplate="{StaticResource PlantillaTarjetaCoche}"
+                                  ButtonBase.Click="Tarjeta_Click">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Rows="2" Columns="4"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+
+                    <!-- Estado vacío: explica qué pasa y ofrece una salida -->
+                    <StackPanel x:Name="PanelVacio" Visibility="Collapsed" HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                        <TextBlock Text="&#xE721;" Style="{StaticResource TxtIcono}" FontSize="32" HorizontalAlignment="Center"
+                                   Foreground="{StaticResource BrSecundario}"/>
+                        <TextBlock Text="No hay modelos que coincidan con tu búsqueda" Style="{StaticResource TxtH3}"
+                                   HorizontalAlignment="Center" Margin="0,12,0,4"/>
+                        <TextBlock Text="Prueba con otros términos o quita alguno de los filtros." Style="{StaticResource TxtSecundario}"
+                                   HorizontalAlignment="Center"/>
+                        <Button Content="Limpiar filtros" Style="{StaticResource BtnSecundario}" HorizontalAlignment="Center"
+                                Margin="0,16,0,0" Click="BtnLimpiar_Click"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- ============ PANEL DE DETALLE (compacto, sin desplazamiento) ============
+                     Datos deliberadamente orientativos: es un prototipo, no un catálogo real. -->
+                <Border x:Name="PanelDetalle" Grid.Column="1" Grid.RowSpan="4" Width="360" Margin="24,0,0,0"
+                        Style="{StaticResource Tarjeta}" Padding="20,14,20,20" Visibility="Collapsed">
+                    <Border.RenderTransform>
+                        <TranslateTransform/>
+                    </Border.RenderTransform>
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="24" ShadowDepth="4" Direction="270" Opacity="0.12"/>
+                    </Border.Effect>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>   <!-- Cabecera de la ficha -->
+                            <RowDefinition Height="Auto"/>   <!-- Foto -->
+                            <RowDefinition Height="Auto"/>   <!-- Nombre -->
+                            <RowDefinition Height="Auto"/>   <!-- Precio -->
+                            <RowDefinition Height="Auto"/>   <!-- Autonomía y descripción -->
+                            <RowDefinition Height="Auto"/>   <!-- Aviso conducción autónoma -->
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>   <!-- Botón -->
+                        </Grid.RowDefinitions>
+
+                        <DockPanel Grid.Row="0">
+                            <Button x:Name="BtnCerrarDetalle" DockPanel.Dock="Right" Style="{StaticResource BtnIconoPlano}"
+                                    Content="&#xE711;" Click="BtnCerrarDetalle_Click"
+                                    ToolTip="Cerrar ficha (Esc)" AutomationProperties.Name="Cerrar ficha"/>
+                            <TextBlock Text="Ficha del modelo" Style="{StaticResource TxtSecundario}" VerticalAlignment="Center"/>
+                        </DockPanel>
+
+                        <!-- Foto del modelo (la misma que en su tarjeta) -->
+                        <Border Grid.Row="1" Height="130" CornerRadius="6" Margin="0,8,0,0" Background="{Binding Fondo}">
+                            <Border CornerRadius="6">
+                                <Border.Background>
+                                    <ImageBrush ImageSource="{Binding Foto}" Stretch="UniformToFill"/>
+                                </Border.Background>
+                            </Border>
+                        </Border>
+
+                        <StackPanel Grid.Row="2" Margin="0,12,0,0">
+                            <TextBlock Text="{Binding Nombre}" Style="{StaticResource TxtH2}" FontSize="19"/>
+                            <TextBlock Text="{Binding TipoYAnio}" Style="{StaticResource TxtSecundario}" Margin="0,2,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="3" Margin="0,10,0,0">
+                            <WrapPanel>
+                                <TextBlock Text="{Binding PrecioTexto}" FontSize="24" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding PrecioOriginalTexto}" TextDecorations="Strikethrough"
+                                           Style="{StaticResource TxtSecundario}" FontSize="14" Margin="10,0,0,3" VerticalAlignment="Bottom"
+                                           Visibility="{Binding TieneOferta, Converter={StaticResource BoolAVisibilidad}}"/>
+                            </WrapPanel>
+                            <TextBlock Text="{Binding AhorroTexto}" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource BrExito}"
+                                       Visibility="{Binding TieneOferta, Converter={StaticResource BoolAVisibilidad}}"/>
+                            <TextBlock Text="Precio orientativo" Style="{StaticResource TxtSecundario}" FontSize="12"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="4" Margin="0,12,0,0">
+                            <TextBlock Style="{StaticResource TxtCuerpo}" FontSize="13.5">
+                                <Run Text="Autonomía aproximada:" Foreground="{StaticResource BrSecundario}"/>
+                                <Run Text="{Binding AutonomiaTexto, Mode=OneWay}" FontWeight="SemiBold"/>
+                            </TextBlock>
+                            <TextBlock Text="{Binding Descripcion}" Style="{StaticResource TxtCuerpo}" FontSize="13.5" Margin="0,6,0,0"/>
+                        </StackPanel>
+
+                        <!-- Expectativas realistas sobre la conducción autónoma en Europa (requisito del cliente) -->
+                        <Border Grid.Row="5" Background="{StaticResource BrSuperficieAlt}" CornerRadius="4" Padding="10,8" Margin="0,12,0,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="&#xE946;" Style="{StaticResource TxtIcono}" VerticalAlignment="Top" Margin="0,2,8,0"
+                                           Foreground="{StaticResource BrSecundario}"/>
+                                <TextBlock Grid.Column="1" Style="{StaticResource TxtSecundario}" FontSize="12.5"
+                                           Text="La conducción autónoma completa aún no se vende en Europa; depende de la normativa."/>
+                            </Grid>
+                        </Border>
+
+                        <!-- La respuesta a la solicitud se muestra en un cuadro de mensaje (como en el login),
+                             así nunca queda fuera de la vista -->
+                        <Button x:Name="BtnPrueba" Grid.Row="7" Content="Solicitar _prueba de conducción" Style="{StaticResource BtnPrimario}"
+                                HorizontalAlignment="Stretch" Margin="0,14,0,0" Click="BtnPrueba_Click"/>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <c:Pie Grid.Row="2"/>
+    </Grid>
+</Window>

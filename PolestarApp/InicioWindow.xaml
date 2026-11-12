@@ -1,0 +1,180 @@
+<Window x:Class="PolestarApp.InicioWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="clr-namespace:PolestarApp.Controls"
+        xmlns:gif="http://wpfanimatedgif.codeplex.com"
+        FontFamily="Segoe UI" Foreground="{StaticResource BrTexto}"
+        Title="Polestar · Inicio" Height="780" Width="1280" MinHeight="740" MinWidth="1200"
+        WindowStartupLocation="CenterScreen" Background="{StaticResource BrFondo}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>   <!-- Cabecera común: logotipo + menú + sesión -->
+            <RowDefinition Height="*"/>      <!-- Contenido de la sección -->
+            <RowDefinition Height="Auto"/>   <!-- Pie común -->
+        </Grid.RowDefinitions>
+
+        <c:Cabecera Grid.Row="0" Seccion="Inicio"/>
+
+        <!-- ================= CONTENIDO (sin barra de desplazamiento) =================
+             Todo cabe en la ventana: dos columnas cuyas filas se reparten el alto disponible.
+             Izquierda: campañas + productos destacados. Derecha: bloque eléctrico + calculadora. -->
+        <Grid x:Name="Contenido" Grid.Row="1" Margin="32,24,32,24">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="24"/>
+                <ColumnDefinition Width="340"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ======================= COLUMNA IZQUIERDA ======================= -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" MinHeight="220"/>   <!-- Carrusel: absorbe el alto sobrante -->
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="Auto"/>   <!-- Pestañas -->
+                    <RowDefinition Height="6"/>
+                    <RowDefinition Height="236"/>    <!-- Tarjetas: alto fijo para que la foto no se recorte en exceso -->
+                </Grid.RowDefinitions>
+
+                <!-- ============ CARRUSEL DE CAMPAÑAS ============
+                     Avanza solo cada 8 s, se detiene al pasar el ratón o al tener el foco
+                     (el usuario controla el ritmo) y se puede manejar con flechas o puntos. -->
+                <Grid x:Name="Carrusel" Grid.Row="0"
+                      MouseEnter="Carrusel_PausarRaton" MouseLeave="Carrusel_ReanudarRaton"
+                      IsKeyboardFocusWithinChanged="Carrusel_FocoCambiado">
+                    <Border x:Name="FondoCampana" CornerRadius="8" Background="#222222"/>
+
+                    <StackPanel x:Name="ContenidoCampana" Margin="72,0,72,0" VerticalAlignment="Center"
+                                HorizontalAlignment="Left" MaxWidth="600">
+                        <TextBlock x:Name="TxtEtiquetaCampana" FontSize="12" FontWeight="SemiBold"
+                                   Foreground="White" Opacity="0.85"/>
+                        <TextBlock x:Name="TxtTituloCampana" FontSize="28" FontWeight="SemiBold" Foreground="White"
+                                   TextWrapping="Wrap" Margin="0,6,0,0"/>
+                        <TextBlock x:Name="TxtSubtituloCampana" FontSize="14" Foreground="White" Opacity="0.9"
+                                   TextWrapping="Wrap" Margin="0,8,0,0"/>
+                        <Button x:Name="BtnCampana" Style="{StaticResource BtnClaro}" HorizontalAlignment="Left"
+                                Margin="0,16,0,0" Click="BtnCampana_Click"/>
+                    </StackPanel>
+
+                    <Button x:Name="BtnAnterior" Style="{StaticResource BtnIconoCarrusel}" Content="&#xE76B;"
+                            HorizontalAlignment="Left" VerticalAlignment="Center" Margin="16,0,0,0"
+                            Click="BtnAnterior_Click" ToolTip="Campaña anterior"
+                            AutomationProperties.Name="Campaña anterior"/>
+                    <Button x:Name="BtnSiguiente" Style="{StaticResource BtnIconoCarrusel}" Content="&#xE76C;"
+                            HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,16,0"
+                            Click="BtnSiguiente_Click" ToolTip="Campaña siguiente"
+                            AutomationProperties.Name="Campaña siguiente"/>
+
+                    <StackPanel x:Name="PanelPuntos" Orientation="Horizontal" HorizontalAlignment="Center"
+                                VerticalAlignment="Bottom" Margin="0,0,0,8"/>
+                </Grid>
+
+                <!-- ============ PESTAÑAS DE PRODUCTOS ============
+                     Una sola fila de tarjetas cuyo contenido cambia según la pestaña elegida:
+                     así las tres listas del enunciado caben sin desplazar la página. -->
+                <DockPanel Grid.Row="2" LastChildFill="True">
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left"
+                                AutomationProperties.Name="Productos destacados">
+                        <RadioButton x:Name="TabNovedades" GroupName="Productos" Style="{StaticResource Pestana}"
+                                     Content="_Novedades" IsChecked="True" Checked="Pestana_Cambiada"/>
+                        <RadioButton x:Name="TabPrecios" GroupName="Productos" Style="{StaticResource Pestana}"
+                                     Content="Mejores _precios" Checked="Pestana_Cambiada"/>
+                        <RadioButton x:Name="TabOfertas" GroupName="Productos" Style="{StaticResource Pestana}"
+                                     Content="Ofertas de _temporada" Checked="Pestana_Cambiada"/>
+                    </StackPanel>
+                    <TextBlock x:Name="TxtDescripcionLista" Style="{StaticResource TxtSecundario}" TextWrapping="NoWrap"
+                               TextTrimming="CharacterEllipsis" TextAlignment="Right" VerticalAlignment="Center"
+                               Margin="0,0,0,6"/>
+                </DockPanel>
+
+                <!-- Fila de 4 tarjetas que se reparten el ancho y el alto disponibles -->
+                <ItemsControl x:Name="ListaProductos" Grid.Row="4" Margin="-6" Focusable="False"
+                              ItemTemplate="{StaticResource PlantillaTarjetaCoche}"
+                              ButtonBase.Click="Tarjeta_Click">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Rows="1" Columns="4"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </Grid>
+
+            <!-- ======================= COLUMNA DERECHA ======================= -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>   <!-- 100 % eléctricos (GIF) -->
+                    <RowDefinition Height="16"/>
+                    <RowDefinition Height="*"/>      <!-- Calculadora -->
+                </Grid.RowDefinitions>
+
+                <!-- ============ GIF ANIMADO: 100 % eléctricos ============
+                     RepeatBehavior="3x": la animación se repite 3 veces y se queda en el último
+                     fotograma (batería llena), para no distraer mientras el usuario lee. -->
+                <Border Grid.Row="0" Style="{StaticResource Tarjeta}" Padding="16,14">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Image Width="80" Height="40" VerticalAlignment="Center"
+                               gif:ImageBehavior.RepeatBehavior="3x"
+                               gif:ImageBehavior.AnimatedSource="Images/carga.gif"
+                               AutomationProperties.Name="Animación de una batería que se carga"/>
+                        <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="100 % eléctricos" Style="{StaticResource TxtH3}"/>
+                            <TextBlock Style="{StaticResource TxtSecundario}" Margin="0,2,0,0"
+                                       Text="Autonomía para el día a día. Pregunta por la carga en casa."/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- ============ CALCULADORA DE CUOTA (funcionalidad añadida) ============ -->
+                <Border Grid.Row="2" Style="{StaticResource Tarjeta}" Padding="20,18">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0">
+                            <TextBlock Text="Calcula tu cuota" Style="{StaticResource TxtH2}" FontSize="18"/>
+                            <TextBlock Text="Estimación rápida para orientar al cliente."
+                                       Style="{StaticResource TxtSecundario}" Margin="0,2,0,12"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1">
+                            <Label Content="_Modelo" Target="{Binding ElementName=CmbModelo}" Margin="0,0,0,4"/>
+                            <ComboBox x:Name="CmbModelo" DisplayMemberPath="Nombre" Padding="8,6" FontSize="13.5"
+                                      SelectionChanged="Calculadora_Cambiada"/>
+
+                            <Label x:Name="LblEntrada" Content="_Entrada" Target="{Binding ElementName=SldEntrada}" Margin="0,10,0,2"/>
+                            <Slider x:Name="SldEntrada" Minimum="0" Maximum="50" Value="20" TickFrequency="5"
+                                    IsSnapToTickEnabled="True" TickPlacement="BottomRight" SmallChange="5" LargeChange="10"
+                                    ValueChanged="Calculadora_Cambiada" AutomationProperties.Name="Porcentaje de entrada"/>
+
+                            <Label Content="P_lazo" Target="{Binding ElementName=CmbPlazo}" Margin="0,10,0,4"/>
+                            <ComboBox x:Name="CmbPlazo" Padding="8,6" FontSize="13.5" SelectionChanged="Calculadora_Cambiada"/>
+                        </StackPanel>
+
+                        <Border Grid.Row="2" Background="{StaticResource BrSuperficieAlt}" CornerRadius="6"
+                                Padding="16,12" Margin="0,14,0,0" VerticalAlignment="Bottom">
+                            <StackPanel>
+                                <TextBlock Text="Cuota estimada" Style="{StaticResource TxtSecundario}"/>
+                                <TextBlock Margin="0,2,0,0">
+                                    <Run x:Name="RunCuota" FontSize="32" FontWeight="SemiBold" Foreground="{StaticResource BrTexto}"/>
+                                    <Run Text=" /mes" FontSize="14" Foreground="{StaticResource BrSecundario}"/>
+                                </TextBlock>
+                                <TextBlock x:Name="TxtResumenCuota" Style="{StaticResource TxtSecundario}" FontSize="12.5" Margin="0,6,0,0"/>
+                                <TextBlock Style="{StaticResource TxtSecundario}" FontSize="11.5" Margin="0,6,0,0"
+                                           Text="Orientativo, con un TIN ficticio del 5,99 %. No es una oferta de financiación."/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <c:Pie Grid.Row="2"/>
+    </Grid>
+</Window>

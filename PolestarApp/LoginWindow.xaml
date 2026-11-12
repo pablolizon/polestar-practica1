@@ -1,0 +1,79 @@
+<Window x:Class="PolestarApp.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="clr-namespace:PolestarApp.Controls"
+        FontFamily="Segoe UI" Foreground="{StaticResource BrTexto}"
+        Title="Polestar · Acceso clientes" Height="780" Width="1280" MinHeight="740" MinWidth="1200"
+        WindowStartupLocation="CenterScreen" Background="{StaticResource BrFondo}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>   <!-- Cabecera común: logotipo + menú + sesión -->
+            <RowDefinition Height="*"/>      <!-- Contenido de la sección -->
+            <RowDefinition Height="Auto"/>   <!-- Pie común -->
+        </Grid.RowDefinitions>
+
+        <c:Cabecera Grid.Row="0" Seccion="Acceso"/>
+
+        <Grid x:Name="Contenido" Grid.Row="1">
+                <Border Style="{StaticResource Tarjeta}" Width="460" Padding="36" Margin="0"
+                        HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Grid>
+                        <!-- ============ FORMULARIO DE ACCESO ============ -->
+                        <StackPanel x:Name="PanelFormulario">
+                            <TextBlock Text="Acceso clientes" Style="{StaticResource TxtH1}"/>
+                            <TextBlock Style="{StaticResource TxtSecundario}" Margin="0,6,0,24" FontSize="14"
+                                       Text="Inicia sesión para reservar pruebas de conducción en tu tienda."/>
+
+                            <!-- Usuario -->
+                            <Label Content="_Usuario" Target="{Binding ElementName=txtUsuario}"/>
+                            <TextBox x:Name="txtUsuario" Style="{StaticResource CampoTexto}"
+                                     AutomationProperties.Name="Usuario"/>
+
+                            <!-- Contraseña: PasswordBox oculta los caracteres que se escriben -->
+                            <Label Content="Con_traseña" Target="{Binding ElementName=txtPassword}" Margin="0,18,0,6"/>
+                            <PasswordBox x:Name="txtPassword" Style="{StaticResource CampoPassword}"
+                                         AutomationProperties.Name="Contraseña"
+                                         KeyUp="Password_ComprobarMayus" GotKeyboardFocus="Password_ComprobarMayus"
+                                         LostKeyboardFocus="Password_PerderFoco"/>
+                            <StackPanel x:Name="AvisoMayus" Orientation="Horizontal" Margin="0,6,0,0" Visibility="Collapsed">
+                                <TextBlock Text="&#xE7BA;" Style="{StaticResource TxtIcono}" FontSize="12"
+                                           Foreground="{StaticResource BrAviso}" Margin="0,0,6,0"/>
+                                <TextBlock Text="Bloq Mayús está activado" FontSize="12.5" Foreground="{StaticResource BrAviso}"/>
+                            </StackPanel>
+
+                            <!-- IsDefault: la tecla Intro envía el formulario -->
+                            <Button x:Name="BtnEntrar" Content="_Entrar" Style="{StaticResource BtnPrimario}" IsDefault="True"
+                                    Margin="0,24,0,0" HorizontalAlignment="Stretch" Click="BtnEntrar_Click"/>
+
+                            <Border Background="{StaticResource BrSuperficieAlt}" CornerRadius="4" Padding="12,10" Margin="0,24,0,0">
+                                <TextBlock Style="{StaticResource TxtSecundario}">
+                                    <Run FontWeight="SemiBold" Text="Cuenta de prueba del prototipo"/><LineBreak/>
+                                    <Run Text="Usuario: Alumno  ·  Contraseña: 1234"/>
+                                </TextBlock>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- ============ SESIÓN INICIADA ============ -->
+                        <StackPanel x:Name="PanelSesionIniciada" Visibility="Collapsed">
+                            <Border Width="48" Height="48" CornerRadius="24" Background="{StaticResource BrExitoFondo}"
+                                    HorizontalAlignment="Left">
+                                <TextBlock Text="&#xE73E;" Style="{StaticResource TxtIcono}" FontSize="20"
+                                           HorizontalAlignment="Center" Foreground="{StaticResource BrExito}"/>
+                            </Border>
+                            <TextBlock x:Name="TxtBienvenida" Style="{StaticResource TxtH1}" Margin="0,16,0,0"/>
+                            <TextBlock Style="{StaticResource TxtCuerpo}" Margin="0,16,0,0"
+                                       Text="Ya puedes solicitar pruebas de conducción desde la ficha de cualquier modelo en la galería."/>
+                            <StackPanel Orientation="Horizontal" Margin="0,24,0,0">
+                                <Button Content="Ir a la galería" Style="{StaticResource BtnPrimario}" Click="BtnIrGaleria_Click"/>
+                                <Button Content="Cerrar _sesión" Style="{StaticResource BtnSecundario}" Margin="12,0,0,0"
+                                        Click="BtnCerrarSesion_Click"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+        </Grid>
+
+        <c:Pie Grid.Row="2"/>
+    </Grid>
+</Window>

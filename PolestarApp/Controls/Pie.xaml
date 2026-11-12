@@ -1,0 +1,14 @@
+<UserControl x:Class="PolestarApp.Controls.Pie"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Pie común a todas las ventanas -->
+    <Border Background="{StaticResource BrSuperficie}"
+            BorderBrush="{StaticResource BrBorde}" BorderThickness="0,1,0,0" Padding="32,10">
+        <DockPanel>
+            <TextBlock DockPanel.Dock="Right" Style="{StaticResource TxtSecundario}" FontSize="12"
+                       Text="¿Dudas? Pregunta a un asesor de la tienda."/>
+            <TextBlock Style="{StaticResource TxtSecundario}" FontSize="12"
+                       Text="Prototipo académico · Interfaces de Usuario (UMH) · Precios y datos orientativos · Fotos: Wikimedia Commons (CC BY-SA 4.0 / CC0)"/>
+        </DockPanel>
+    </Border>
+</UserControl>
